@@ -75,41 +75,64 @@ $(document).ready(function() {
     }
  /* end Rain */
  /*Start Snow */
+    var windTrigger = 0;
+	var windBlow = false;
+	var velocityInc = 2;
+	var windX = 1;
+	setInterval(function(){
+		if(windBlow == false){
+			windBlow = true;
+			velocityInc = 2;
+			windX = 1;
 
+		}
+		setTimeout(function(){
+		windBlow = false;
+		},3000);
+		
+	}, 1000*10);
+	/*
+	setInterval(function(){
+		if(windBlow = true){
+			velocityInc += .5;
+		}
+	},300); */
 	var counter = 0;
 	var windBlow = false;
 	var windBlowCount = 0;
+	
     function drawSnow() {
-	      canvasCT.strokeStyle = 'rgba(255,255,255,0.9)';
 		
+	      canvasCT.strokeStyle = 'rgba(255,255,255,0.9)';
+		if(windBlow == true){
+			velocityInc += .03;
+			windX +=.03;
+		}
+		if(windBlow == false && windX > 1){
+			windX -=.01;
+		}
+		if(windBlow == false && velocityInc > 1){
+			velocityInc -= .01;
+		}
       canvasCT.clearRect(0, 0, w, h);
       for(var c = 0; c < particles.length; c++){
         var p = particles[c];
         canvasCT.beginPath();
-		var randBlow = Math.floor(Math.random() * 100000 + 1 );
-		if(( randBlow % 2) == 0  && counter > 100 ){
-			windBlow == true;
-		}
-		if(windBlow == true){	
-			//alert("BLOW");
-			p.ys = Math.random() * 100 + 2;
-			//p.xs = Math.random() * 100 + 10;
-			windBlowCount++;
-			//p.x = Math.random() * w;
-			if(windBlowCount == 100){
-				windBlow = false;
-				windBlowCount = 0;
-			}
-			counter = 0;
-		}else{
-			counter++;
-			p.ys = Math.random() * 1 + 2;
+		
+		
+			p.ys = Math.random() *  2 + 1;
 			//p.x = Math.random() * w;
 			//p.xs = -4 + Math.random() * 4 + 2;
 
-		}
-        canvasCT.moveTo(p.x, p.y);
+        
+		if(windBlow == false){
+		canvasCT.moveTo(p.x, p.y);
         canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * p.ys);
+		}else{
+				canvasCT.moveTo(p.x, p.y);
+		        canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * -(Math.random() * velocityInc + 1));
+
+		}
         canvasCT.stroke();
       }
       moveSnow();
@@ -118,8 +141,18 @@ $(document).ready(function() {
     function moveSnow() {
       for(var b = 0; b < particles.length; b++) {
         var p = particles[b];
+		if(windBlow == false){
         p.x += p.xs;
         p.y += p.ys;
+		}else{
+			if(p.xs < 0 ){
+			p.x += ((p.xs * windX) );
+			p.y += ((Math.random() * velocityInc + 1) *.8);
+			}else{
+			p.x += (p.xs * windX) ;
+			p.y += ((Math.random() * velocityInc + 1) *.8);
+			}
+		}
         if(p.x > w || p.y > h) {
           p.x = Math.random() * w;
           p.y = -1;
