@@ -88,7 +88,7 @@ $(document).ready(function() {
   * Wind directions are stored in an 
   * array and the index is changed incrementally 
  */
-	var driftVal = [1,1,2,2,3,3,5,7,7,5,4,2,-2,1,,-2,-3,-4,-5,-3,-2,1,2,5,6,6,5,3,2,1]
+	var driftVal = [1,1,2,2,3,3,5,7,7,5,4,2,-2,1,-2,-3,-4,-5,-3,-2,1,2,5,6,6,5,3,2,1]
 	var driftIndex = -1;
 /* Change drift index every 3 seconds */
 	setInterval(function(){
