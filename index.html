@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Particles</title>
+<meta charset="UTF-8">
+ <link rel="stylesheet" href="style.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="particle.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div id="container">
+
+	<div id="header">
+		<div class="headerContainer" >
+		<select id="animationOptions" onchange="getType(this)">
+			<option value="rain">Rain</option>
+			<option value="snow">Snow</option>
+		</select>
+		<div id="animationControls" class="pause">
+			<div id="start"></div>
+		</div>
+	</div>
+	</div>
+	
+	<div id="animationFrame">
+		<canvas id="canvas"></canvas>
+	</div>
+</div>
+<script>
+/******
+ Handles button listeners and resizing events.
+*******/
+
+
+$(window).resize(function(){
+	newHeight = $(window).height();
+	newWidth = $(window).width();
+	
+	
+	$("#canvas").css('height',newHeight);
+	$("#canvas").css('width',newWidth);
+
+});
+</script>
+
+</body>
+</html>
