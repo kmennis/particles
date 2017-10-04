@@ -1,30 +1,30 @@
-/* Track for change in type */
+/* Track for change in type 
+ * HTML onchange cannot track functions in .ready(). Must be outside.
+*/
 var changeType = "rain";
-	function getType(type){
-		var getVal = type.options[type.selectedIndex];
-		changeType = getVal.value;
-	}	
-	
-/****/
+function getType(type){
+	var getVal = type.options[type.selectedIndex];
+	changeType = getVal.value;
+}	
 	
 $(document).ready(function() {
 /* Prepare canvas */
-  var canvas = $('#canvas')[0];
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-    var paused = true;
+	var canvas = $('#canvas')[0];
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	var paused = true;
 
-  if(canvas.getContext) {
-    var canvasCT = canvas.getContext('2d');
-    var w = canvas.width;
-    var h = canvas.height;
    
-    canvasCT.lineWidth = 1;
-    canvasCT.lineCap = 'round';
+	if(canvas.getContext) {
+		var canvasCT = canvas.getContext('2d');
+		var w = canvas.width;
+		var h = canvas.height;
+		canvasCT.lineWidth = 1;
+		canvasCT.lineCap = 'round';
     
-    /*Max of 1000 particles */
-    var init = [];
-    var maxParts = 1000;
+		/*Max of 1000 particles */
+		var init = [];
+		var maxParts = 1000;
 
 /* Initialize particles */
     for(var a = 0; a < maxParts; a++) {
@@ -44,120 +44,94 @@ $(document).ready(function() {
 
 /*Finish Initializing particles */
 
- /* Rain */
+ /* Rain
+ * DrawRain- Gets initial point of each particle, then calls move
+  * MoveRain- Move rain calculates the next position of the particle to get to
+  * these two points make the particle
+  * 
+  *
+ */
     function drawRain() {
-	 canvasCT.strokeStyle = 'rgba(174,194,224,0.5)';
-      canvasCT.clearRect(0, 0, w, h);
-      for(var c = 0; c < particles.length; c++) {
-        var p = particles[c];
-		p.ys = Math.random() * 10 + 10;
-		p.xs = -4 + Math.random() * 4 + 2;
-		//p.x = Math.random() * w;
-		//p.y = -20;
-        canvasCT.beginPath();
-        canvasCT.moveTo(p.x, p.y);
-        canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * p.ys);
-        canvasCT.stroke();
-      }
-      moveRain();
+		canvasCT.strokeStyle = 'rgba(174,194,224,0.5)';
+		canvasCT.clearRect(0, 0, w, h);
+		for(var c = 0; c < particles.length; c++) {
+			var p = particles[c];
+			p.ys = Math.random() * 10 + 10;
+			p.xs = -4 + Math.random() * 4 + 2;
+			//p.x = Math.random() * w;
+			//p.y = -20;
+			canvasCT.beginPath();
+			canvasCT.moveTo(p.x, p.y);
+			canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * p.ys);
+			canvasCT.stroke();
+		}
+		moveRain();
     }
-    
+    //move the particle back to the top
     function moveRain() {
-      for(var b = 0; b < particles.length; b++) {
-        var p = particles[b];
-        p.x += p.xs;
-        p.y += p.ys;
-        if(p.x > w || p.y > h) {
-          p.x = Math.random() * w;
-          p.y = -20;
-        }
-      }
+		for(var b = 0; b < particles.length; b++) {
+			var p = particles[b];
+			p.x += p.xs;
+			p.y += p.ys;
+			if(p.x > w || p.y > h) {
+				p.x = Math.random() * w;
+				p.y = -20;
+			}
+		}
     }
  /* end Rain */
+ 
+ 
  /*Start Snow */
-    var windTrigger = 0;
-	var windBlow = false;
-	var velocityInc = 2;
-	var windX = 1;
+ 
+ /* 
+  * Wind directions are stored in an 
+  * array and the index is changed incrementally 
+ */
+	var driftVal = [1,1,2,2,3,3,5,7,7,5,4,2,-2,1,,-2,-3,-4,-5,-3,-2,1,2,5,6,6,5,3,2,1]
+	var driftIndex = -1;
+/* Change drift index every 3 seconds */
 	setInterval(function(){
-		if(windBlow == false){
-			windBlow = true;
-			velocityInc = 2;
-			windX = 1;
-
-		}
-		setTimeout(function(){
-		windBlow = false;
-		},3000);
-		
-	}, 1000*10);
-	/*
-	setInterval(function(){
-		if(windBlow = true){
-			velocityInc += .5;
-		}
-	},300); */
+		driftIndex++;
+		if(driftIndex >= driftVal.length){
+			driftIndex = 0;
+		}	
+	},1000*3);
 	var counter = 0;
-	var windBlow = false;
 	var windBlowCount = 0;
-	
+/* Snow
+ * drawSnow()- Gets initial point of each particle, then calls move
+  * drawSnow()- Move rain calculates the next position of the particle to get to
+  * these two points make the particle
+  * Unlike rain, it uses a drift value to have particles drift in the same directions
+  * to simulate wind
+ */
     function drawSnow() {
-		
-	      canvasCT.strokeStyle = 'rgba(255,255,255,0.9)';
-		if(windBlow == true){
-			velocityInc += .03;
-			windX +=.03;
-		}
-		if(windBlow == false && windX > 1){
-			windX -=.01;
-		}
-		if(windBlow == false && velocityInc > 1){
-			velocityInc -= .01;
-		}
-      canvasCT.clearRect(0, 0, w, h);
-      for(var c = 0; c < particles.length; c++){
-        var p = particles[c];
-        canvasCT.beginPath();
-		
-		
+	    canvasCT.strokeStyle = 'rgba(255,255,255,0.9)';
+		canvasCT.clearRect(0, 0, w, h);
+		for(var c = 0; c < particles.length; c++){
+			var p = particles[c];
+			canvasCT.beginPath();
+			//Snow needs to fall slower, choose a smaller ys
 			p.ys = Math.random() *  2 + 1;
-			//p.x = Math.random() * w;
-			//p.xs = -4 + Math.random() * 4 + 2;
-
-        
-		if(windBlow == false){
-		canvasCT.moveTo(p.x, p.y);
-        canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * p.ys);
-		}else{
-				canvasCT.moveTo(p.x, p.y);
-		        canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * -(Math.random() * velocityInc + 1));
-
+			canvasCT.moveTo(p.x, p.y);
+			canvasCT.lineTo(p.x + p.l * p.xs, p.y + p.l * p.ys);
+			canvasCT.stroke();
 		}
-        canvasCT.stroke();
-      }
-      moveSnow();
+		moveSnow();
     }
     
     function moveSnow() {
-      for(var b = 0; b < particles.length; b++) {
-        var p = particles[b];
-		if(windBlow == false){
-        p.x += p.xs;
-        p.y += p.ys;
-		}else{
-			if(p.xs < 0 ){
-			p.x += ((p.xs * windX) );
-			p.y += ((Math.random() * velocityInc + 1) *.8);
-			}else{
-			p.x += (p.xs * windX) ;
-			p.y += ((Math.random() * velocityInc + 1) *.8);
+		for(var b = 0; b < particles.length; b++) {
+			var p = particles[b];
+			p.x += p.xs + driftVal[driftIndex];
+			p.y += p.ys;
+			//move the particles back to the top
+			if(p.x > w || p.y > h) {
+				p.x = Math.random() * w;
+				p.y = -1;
 			}
 		}
-        if(p.x > w || p.y > h) {
-          p.x = Math.random() * w;
-          p.y = -1;
-        }
-      }
     }
 /* End snow*/
    
@@ -167,7 +141,10 @@ $(document).ready(function() {
 var startButton = document.getElementById('start');
 var bttnCtnr = document.getElementById('animationControls');
 var clickFlip = 0;
-
+/*
+ * Changes css class to show play pause button. Also dictates which
+ * Animation is played
+ */
 startButton.onclick = function(){
 		if(clickFlip == 0){
 			bttnCtnr.setAttribute('class','play');
@@ -179,7 +156,7 @@ startButton.onclick = function(){
 			clickFlip = 0;
 		}
 	};
-	
+//Play the animation snow or rain
 	 setInterval(function(){
 		if(paused == false){
 			if(changeType == "rain"){
